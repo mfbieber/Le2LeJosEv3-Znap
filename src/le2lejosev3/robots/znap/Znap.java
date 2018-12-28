@@ -63,6 +63,8 @@ public class Znap {
  */
 class ZnpThread extends Thread {
 
+	private static final Logger log = Logger.getLogger(ZnpThread.class.getName());
+
 	private final UltrasonicSensor ultrasonic;
 	private final MediumMotor motorB;
 
@@ -71,6 +73,7 @@ class ZnpThread extends Thread {
 	 * (my model robot uses the medium motor on port A)
 	 */
 	public ZnpThread() {
+		log.fine("");
 		// instantiate the ultrasonic sensor
 		ultrasonic = new UltrasonicSensor(Znap.usSensorPort);
 		// instantiate a medium motor
@@ -89,6 +92,7 @@ class ZnpThread extends Thread {
 
 			// Get ultrasonic distance in centimeters
 			distance = ultrasonic.measureDistanceCentimeters();
+			log.fine("distance: " + distance);
 
 			if ((distance < 40) && Znap.chk) {
 				// less than 40cm from obstacle:
@@ -97,9 +101,11 @@ class ZnpThread extends Thread {
 
 				// Get ultrasonic distance in centimeters
 				distance = ultrasonic.measureDistanceCentimeters();
+				log.fine("distance: " + distance);
 
 				if (distance < 25) {
 					// less than 25cm from obstacle:
+					log.fine("distance < 25: T-rex roar");
 
 					// Medium motor B on with power -100
 					motorB.motorOn(-100);
@@ -120,6 +126,7 @@ class ZnpThread extends Thread {
 					Wait.time(0.5F);
 					
 				} else {
+					log.fine("distance > 25: Snake hiss");
 
 					// Medium motor B on for 120 degrees and power -100 and brake afterwards
 					motorB.motorOnForDegrees(-100, 120, true);
@@ -139,6 +146,8 @@ class ZnpThread extends Thread {
 				Znap.interruptROL = false;
 			}
 		} // End ZNP loop
+
+		log.fine("End");
 	}
 }
 
@@ -146,6 +155,8 @@ class ZnpThread extends Thread {
  * The MN loop thread.
  */
 class MnThread extends Thread {
+
+	private static final Logger log = Logger.getLogger(MnThread.class.getName());
 	
 	private final MoveSteering move;
 
@@ -153,6 +164,7 @@ class MnThread extends Thread {
 	 * Constructor
 	 */
 	public MnThread() {
+		log.fine("");
 		// instantiate a move steering for left and right motors
 		move = new MoveSteering(Znap.motorPortB, Znap.motorPortC);
 	}
@@ -168,42 +180,35 @@ class MnThread extends Thread {
 		while (Button.ESCAPE.isUp()) {
 
 			// ROL loop
-			while (Button.ESCAPE.isUp()) {
+			while (Button.ESCAPE.isUp() && !Znap.interruptROL) {
 
 				// set chk to true
 				Znap.chk = true;
-				if (Znap.interruptROL) {
-					break;
-				}
+				log.fine("Znap.chk: " + Znap.chk);
 
 				// get random number between 1 and 3
 				rotations = Random.numeric(1, 3);
+				log.fine("Steering 100 rotations: " + rotations);
 				// move steering on for rotations with power 100 and steering 100 and brake at end
 				move.motorsOnForRotations(100, 100, rotations, true);
-				if (Znap.interruptROL) {
-					break;
-				}
 
 				// get random number between 1 and 3
 				rotations = Random.numeric(1, 3);
+				log.fine("Steering -100 rotations: " + rotations);
 				// move steering on for rotations with power 100 and steering -100 and brake at end
 				move.motorsOnForRotations(-100, 100, rotations, true);
-				if (Znap.interruptROL) {
-					break;
-				}
 
 				// get random number between 1 and 3
 				rotations = Random.numeric(1, 3);
+				log.fine("Steering 0 rotations: " + rotations);
 				// move steering on for rotations with power -100 and steering 0 and brake at end
 				move.motorsOnForRotations(0, -100, rotations, true);
-				if (Znap.interruptROL) {
-					break;
-				}
 
 			} // End ROL loop
 
 			// set chk to false
 			Znap.chk = false;
+			log.fine("Znap.chk: " + Znap.chk);
 
 			// move steering off and brake at end
 			move.motorsOff(true);
@@ -211,5 +216,7 @@ class MnThread extends Thread {
 			// wait 2 seconds
 			Wait.time(2F);
 		} // End MN loop
+
+		log.fine("End");
 	}
 }
