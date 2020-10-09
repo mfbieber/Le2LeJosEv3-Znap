@@ -1,0 +1,59 @@
+buildscript {
+    repositories {
+        jcenter()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "gradle.plugin.com.github.bdeneuter:mindstorms-plugin:1.2.3"
+    }
+}
+
+plugins {
+    id "com.github.bdeneuter.mindstorms.ev3" version "1.2.3"
+    id 'java'
+}
+
+mindstorms {
+    // Your Java main class (the class with the method: public static void main(String ... args))
+    main = 'le2lejosev3.robots.znap.Znap'
+
+    // Optional: The IP address from the EV3 brick. Default value is 10.0.1.1
+    //ip = '10.0.1.1'
+
+    // Optional: the user for the EV3 brick. Default value is root
+    //user = 'root'
+
+    // Optional: the password for the user of the EV3 brick (Don't check in paswords in repositories! If you use a password, put it in the gradle.properties in your GRADLE_HOME and assign the variable to the password field. Default value is none
+    //password = ''
+
+    // Optional: the directory on the EV3 brick where the applications will be stored. Default is /home/lejos/programs
+   //home = '/home/lejos/programs'
+}
+
+group 'org.haffson'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    //testCompile group: 'com.github.bdeneuter', name: 'lejos-ev3-api', version: '0.9.1-beta'
+
+    compile files('lib/le2lejosev3.jar')
+
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+    compile group: 'ch.qos.logback', name: 'logback-core', version: '1.2.3'
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
+    compile group: 'io.micrometer', name: 'micrometer-core', version: '1.5.4'
+    compile group: 'org.springframework', name: 'spring-context', version: '5.2.8.RELEASE'
+
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+compileJava {
+    sourceCompatibility = '1.8'
+    targetCompatibility = '1.8'
+}
